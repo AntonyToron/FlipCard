@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">FlipCard</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_game_over">GameOverActivity</string>
+</resources>
