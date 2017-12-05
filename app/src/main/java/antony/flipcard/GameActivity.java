@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.media.Image;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,7 +34,8 @@ public class GameActivity extends AppCompatActivity {
     private static final int MEDIUM_SIZE = 6;
     private static final int HARD_SIZE = 8;
     //private Button[][] buttons;
-    private ImageView[][] cards;
+    //private ImageView[][] cards;
+    private int[][] cards;
     private int[][] backgrounds;
     private TextView player1_turn;
     private TextView player2_turn;
@@ -58,11 +60,6 @@ public class GameActivity extends AppCompatActivity {
     private int total_cards;
 
     private String difficulty;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,9 +78,6 @@ public class GameActivity extends AppCompatActivity {
 
         setButtonBackgrounds(difficulty);
         initializeBoard(difficulty);
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void setLayout(String difficulty) {
@@ -109,7 +103,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void setButtonBackgrounds(String difficulty) {
         if (difficulty.equals("normal")) {
-            cards = new ImageView[NORMAL_SIZE][NORMAL_SIZE];
+            cards = new int[NORMAL_SIZE][NORMAL_SIZE];
 
             for (int i = 1; i < NORMAL_SIZE + 1; i++) {
                 for (int j = 1; j < NORMAL_SIZE + 1; j++) {
@@ -118,13 +112,13 @@ public class GameActivity extends AppCompatActivity {
 
                     String buttonId = "normal_row" + i + "_" + j;
                     int resId = getResources().getIdentifier(buttonId, "id", getPackageName());
-                    cards[i - 1][j - 1] = (ImageView) findViewById(resId);
+                    cards[i - 1][j - 1] = resId;
 
-                    initializeCard(cards[i - 1][j - 1], x, y, difficulty);
+                    initializeCard((ImageView) findViewById(resId), x, y, difficulty);
                 }
             }
         } else if (difficulty.equals("medium")) {
-            cards = new ImageView[MEDIUM_SIZE][MEDIUM_SIZE];
+            cards = new int[MEDIUM_SIZE][MEDIUM_SIZE];
 
             for (int i = 1; i < MEDIUM_SIZE + 1; i++) {
                 for (int j = 1; j < MEDIUM_SIZE + 1; j++) {
@@ -133,13 +127,13 @@ public class GameActivity extends AppCompatActivity {
 
                     String buttonId = "normal_row" + i + "_" + j;
                     int resId = getResources().getIdentifier(buttonId, "id", getPackageName());
-                    cards[i - 1][j - 1] = (ImageView) findViewById(resId);
+                    cards[i - 1][j - 1] = resId;
 
-                    initializeCard(cards[i - 1][j - 1], x, y, difficulty);
+                    initializeCard((ImageView) findViewById(resId), x, y, difficulty);
                 }
             }
         } else {
-            cards = new ImageView[HARD_SIZE][HARD_SIZE];
+            cards = new int[HARD_SIZE][HARD_SIZE];
 
             for (int i = 1; i < HARD_SIZE + 1; i++) {
                 for (int j = 1; j < HARD_SIZE + 1; j++) {
@@ -148,9 +142,9 @@ public class GameActivity extends AppCompatActivity {
 
                     String buttonId = "normal_row" + i + "_" + j;
                     int resId = getResources().getIdentifier(buttonId, "id", getPackageName());
-                    cards[i - 1][j - 1] = (ImageView) findViewById(resId);
+                    cards[i - 1][j - 1] = resId;
 
-                    initializeCard(cards[i - 1][j - 1], x, y, difficulty);
+                    initializeCard((ImageView) findViewById(resId), x, y, difficulty);
                 }
             }
         }
@@ -178,7 +172,7 @@ public class GameActivity extends AppCompatActivity {
         //image.setImageAlpha(127);
         Bitmap b;
         if (difficulty.equals("normal")) {
-            b = BitmapFactory.decodeResource(getResources(), R.drawable.question_mark);
+            b = BitmapFactory.decodeResource(getResources(), R.drawable.question_mark_small);
             ViewGroup.LayoutParams params = image.getLayoutParams();
             params.width = width / NORMAL_SIZE;
             params.height = width / NORMAL_SIZE; // same as width
@@ -195,7 +189,7 @@ public class GameActivity extends AppCompatActivity {
             params.width = width / HARD_SIZE;
             params.height = width / HARD_SIZE; // same as width
             image.setLayoutParams(params);
-            b = BitmapFactory.decodeResource(getResources(), R.drawable.question_mark);
+            b = BitmapFactory.decodeResource(getResources(), R.drawable.question_mark_small);
         }
 
         //b.setHasAlpha(true);
@@ -208,7 +202,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void cardClicked(int i, int j) {
-        final ImageView card = cards[i][j];
+        final ImageView card = (ImageView) findViewById(cards[i][j]);
 
         if (!canFlip || backgrounds[i][j] == -1) {
             return; // should not flip any cards
@@ -217,13 +211,20 @@ public class GameActivity extends AppCompatActivity {
             return;
         }
 
+//        Bitmap b;
+//        Bitmap resized;
         if (cardFlipped == 0) {
             cardFlipped++;
 
             // flip the card over
             //card.setText("Clicked");
             //card.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.elephant_small));
-            card.setImageBitmap(BitmapFactory.decodeResource(getResources(), backgrounds[i][j]));
+            Bitmap b = BitmapFactory.decodeResource(getResources(), backgrounds[i][j]);
+//            if (backgrounds[i][j] == R.drawable.beaver_small)
+//                resized = Bitmap.createScaledBitmap(b, (int) (b.getWidth() * 0.3), (int) (b.getHeight() * 0.3), true);
+//            else
+//                resized = b;
+            card.setImageBitmap(b);
 
             // set location
             i_card0 = i;
@@ -236,7 +237,12 @@ public class GameActivity extends AppCompatActivity {
             // flip the card over
             //card.setText("Clicked");
             //card.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.elephant_small));
-            card.setImageBitmap(BitmapFactory.decodeResource(getResources(), backgrounds[i][j]));
+            Bitmap b = BitmapFactory.decodeResource(getResources(), backgrounds[i][j]);
+//            if (backgrounds[i][j] == R.drawable.beaver_small)
+//                resized = Bitmap.createScaledBitmap(b, (int) (b.getWidth() * 0.1), (int) (b.getHeight() * 0.1), true);
+//            else
+//                resized = b;
+            card.setImageBitmap(b);
 
             // disable clicking for a while
             canFlip = false;
@@ -271,15 +277,17 @@ public class GameActivity extends AppCompatActivity {
         final Runnable resetCards = new Runnable() {
             @Override
             public void run() {
+                ImageView card0 = (ImageView) findViewById(cards[i_card0][j_card0]);
+                ImageView card1 = (ImageView) findViewById(cards[i_card1][j_card1]);
                 if (difficulty.equals("normal")) {
-                    cards[i_card0][j_card0].setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark));
-                    cards[i_card1][j_card1].setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark));
+                    card0.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark_small));
+                    card1.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark_small));
                 } else if (difficulty.equals("medium")) {
-                    cards[i_card0][j_card0].setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark));
-                    cards[i_card1][j_card1].setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark));
+                    card0.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark_small));
+                    card1.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark_small));
                 } else {
-                    cards[i_card0][j_card0].setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark));
-                    cards[i_card1][j_card1].setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark));
+                    card0.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark_small));
+                    card1.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark_small));
                 }
 
                 // change player turn
@@ -305,9 +313,12 @@ public class GameActivity extends AppCompatActivity {
         final Runnable resetCards = new Runnable() {
             @Override
             public void run() {
+                ImageView card0 = (ImageView) findViewById(cards[i_card0][j_card0]);
+                ImageView card1 = (ImageView) findViewById(cards[i_card1][j_card1]);
+
                 // remove both cards
-                cards[i_card0][j_card0].setImageAlpha(0);
-                cards[i_card1][j_card1].setImageAlpha(0);
+                card0.setImageAlpha(0);
+                card1.setImageAlpha(0);
                 backgrounds[i_card0][j_card0] = -1;
                 backgrounds[i_card1][j_card1] = -1;
 
@@ -363,7 +374,7 @@ public class GameActivity extends AppCompatActivity {
             player1_turn.setText("Your Turn!");
             player2_turn.setText("");
         }
-        System.out.println("Current rotation: " + cards[0][0].getRotation());
+        // System.out.println("Current rotation: " + cards[0][0].getRotation());
         int length;
         if (difficulty.equals("normal")) {
             length = NORMAL_SIZE;
@@ -376,11 +387,13 @@ public class GameActivity extends AppCompatActivity {
         // rotate all of the cards 180 degrees for the other player
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < length; j++) {
-                cards[i][j].setPivotX(cards[i][j].getWidth() / 2);
-                cards[i][j].setPivotY(cards[i][j].getHeight() / 2);
+                ImageView card = (ImageView) findViewById(cards[i][j]);
+
+                card.setPivotX(card.getWidth() / 2);
+                card.setPivotY(card.getHeight() / 2);
                 int angle = 180;
 
-                cards[i][j].setRotation(cards[i][j].getRotation() + angle);
+                card.setRotation(card.getRotation() + angle);
             }
         }
 
@@ -398,8 +411,11 @@ public class GameActivity extends AppCompatActivity {
 
     private void initializeBoard(String difficulty) {
         LinkedList<Point> points = new LinkedList<Point>();
-        // R.drawable.giraffe2_transparent
-        int[] images = {R.drawable.elephant, R.drawable.monkey, R.drawable.cow, R.drawable.giraffe};
+        // R.drawable.giraffe2_transparent, R.drawable.beaver_small, R.drawable.goose, R.drawable.rooster
+        int[] images = {R.drawable.elephant, R.drawable.monkey,
+                        R.drawable.cow, R.drawable.giraffe,
+                        R.drawable.dog, R.drawable.cat,
+                        R.drawable.chicken};
 
         if (difficulty.equals("normal")) {
 
