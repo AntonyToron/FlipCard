@@ -5,3 +5,6 @@ Kids learn by interacting with objects and experiencing new things everday, but 
 
 ## FlipCard Overview
 Flipcard is a simple game designed to allow for play with others, while also focusing on some core aspects of knowledge at early stages in a child's life: memory and object permanence! It mimics the classic style of game of flipping cards and trying to get two matching cards, but adds in the element of having it turn-based to incorporate the element of learning from peers.
+
+## Technologies Used
+- Android SDK - Java
